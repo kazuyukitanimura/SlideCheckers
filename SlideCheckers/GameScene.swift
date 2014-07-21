@@ -11,11 +11,11 @@ import SpriteKit
 class GameScene: SKScene {
     let screenSize: CGRect = UIScreen.mainScreen().bounds
     let screenWidth: CGFloat = UIScreen.mainScreen().bounds.width * UIScreen.mainScreen().scale
-    
+
     var slider: SKSpriteNode!
     var touchX: CGFloat!
     var speedX: CGFloat!
-    
+
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
         //let myLabel = SKLabelNode(fontNamed:"Chalkduster")
@@ -35,33 +35,41 @@ class GameScene: SKScene {
         //let action = SKAction.rotateByAngle(CGFloat(M_PI), duration:1)
         //slider.runAction(SKAction.repeatActionForever(action))
     }
-    
+
     override func touchesBegan(touches: NSSet, withEvent event: UIEvent) {
         /* Called when a touch begins */
         for touch: AnyObject in touches {
             let location = touch.locationInNode(self)
             touchX = location.x
+            if shouldMoveSlider(location) {
+                speedX = 0.0
+            }
         }
-        speedX = 0.0
     }
-    
+
     override func touchesMoved(touches: NSSet, withEvent event: UIEvent) {
         for touch: AnyObject in touches {
             let location = touch.locationInNode(self)
-            slider.position.x = moveSlider(location.x - touchX)
+            if shouldMoveSlider(location) {
+                slider.position.x = moveSlider(location.x - touchX)
+            }
             touchX = location.x
         }
     }
-    
+
     override func touchesEnded(touches: NSSet, withEvent event: UIEvent) {
         speedX = 1.0
     }
-   
+
     override func update(currentTime: CFTimeInterval) {
         /* Called before each frame is rendered */
         slider.position.x = moveSlider(speedX)
     }
-    
+
+    func shouldMoveSlider(location:CGPoint) ->Bool {
+        return location.y < CGRectGetMaxY(slider.frame) && location.y > CGRectGetMinY(slider.frame)
+    }
+
     func moveSlider(deltaX: CGFloat) ->CGFloat {
         return slider.size.width + (slider.position.x + deltaX - slider.size.width) % screenWidth
     }
